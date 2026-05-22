@@ -1,0 +1,12 @@
+# Ignore python cache files
+__pycache__/
+*.pyc
+
+# Ignore Groq testing script (contains API key)
+test_groq.py
+
+# Ignore local generated frames/images
+frame.png
+*.jpg
+*.png
+*.jpeg

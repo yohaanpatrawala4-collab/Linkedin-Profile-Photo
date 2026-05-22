@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Image Overlay | ABLBL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1115;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #E50019; /* ABLBL Red */
+            --accent-glow: rgba(229, 0, 25, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #a0a5b1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Abstract Background Elements */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: rgba(229, 0, 25, 0.15);
+            top: -100px;
+            left: -100px;
+        }
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.05);
+            bottom: -200px;
+            right: -100px;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #a0a5b1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .upload-box {
+            position: relative;
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.2);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: rgba(229, 0, 25, 0.05);
+        }
+
+        .upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .upload-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .upload-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .file-name {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-left: 1px solid var(--glass-border);
+            padding-left: 2rem;
+            min-height: 400px;
+        }
+
+        .preview-container {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .placeholder-text {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .action-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+            background: #ff0a24;
+        }
+
+        .action-btn:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .download-btn {
+            background: transparent;
+            border: 1px solid var(--text-main);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .download-btn:hover {
+            background: rgba(255,255,255,0.1);
+            box-shadow: none;
+        }
+
+        .error-msg {
+            color: #ff4e4e;
+            background: rgba(255, 78, 78, 0.1);
+            border: 1px solid rgba(255, 78, 78, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            display: none;
+            text-align: center;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .glass-panel {
+                grid-template-columns: 1fr;
+            }
+            .preview-section {
+                border-left: none;
+                border-top: 1px solid var(--glass-border);
+                padding-left: 0;
+                padding-top: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <div class="container">
+        <header>
+            <h1>Brand Identity Overlay</h1>
+            <p>Precise, 1:1 pixel fidelity employee photo framing</p>
+        </header>
+
+        <div class="glass-panel">
+            <div class="upload-section">
+                <!-- MAIN FORM (No custom frame upload, frame is embedded on server) -->
+                <form id="overlayForm">
+                    <div class="upload-box" id="empBox">
+                        <input type="file" id="employeeImg" accept="image/*" required>
+                        <span class="upload-icon">👤</span>
+                        <span class="upload-label">Upload Employee Photo</span>
+                        <span class="upload-sub">Must contain a clear face</span>
+                        <div class="file-name" id="empFileName"></div>
+                    </div>
+
+                    <div class="error-msg" id="errorMsg"></div>
+
+                    <button type="submit" class="action-btn" id="generateBtn">Generate Overlay</button>
+                </form>
+            </div>
+
+            <div class="preview-section">
+                <div class="preview-container">
+                    <span class="placeholder-text" id="placeholderTxt">Preview Output</span>
+                    <div class="spinner" id="loadingSpinner"></div>
+                    <img src="" alt="Final Result" class="preview-img" id="resultImg">
+                </div>
+                <a href="#" download="branded_employee.png" class="action-btn download-btn" id="downloadBtn">Download Result</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Main Elements
+        const overlayForm = document.getElementById('overlayForm');
+        const employeeImg = document.getElementById('employeeImg');
+        const empFileName = document.getElementById('empFileName');
+        const generateBtn = document.getElementById('generateBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        
+        // Preview Elements
+        const resultImg = document.getElementById('resultImg');
+        const placeholderTxt = document.getElementById('placeholderTxt');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Main Form Event Listeners
+        employeeImg.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                empFileName.textContent = e.target.files[0].name;
+            }
+        });
+
+        overlayForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMsg.style.display = 'none';
+            resultImg.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            placeholderTxt.style.display = 'none';
+            loadingSpinner.style.display = 'block';
+            generateBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('employee_image', employeeImg.files[0]);
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Processing failed');
+                }
+
+                // Show success
+                resultImg.src = data.image_data;
+                downloadBtn.href = data.image_data;
+                
+                loadingSpinner.style.display = 'none';
+                resultImg.style.display = 'block';
+                downloadBtn.style.display = 'block';
+                
+            } catch (err) {
+                loadingSpinner.style.display = 'none';
+                placeholderTxt.style.display = 'block';
+                errorMsg.textContent = err.message;
+                errorMsg.style.display = 'block';
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
