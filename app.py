@@ -6,9 +6,9 @@ from PIL import Image, ImageOps
 from frame_data import FRAME_BASE64
 
 # Page Configuration
-st.set_page_config(page_title="Brand Identity Overlay", page_icon="🖼️", layout="centered")
+st.set_page_config(page_title="Create Your ABLBL Persona", page_icon="🖼️", layout="centered")
 
-st.title("Brand Identity Overlay")
+st.title("Create Your ABLBL Persona")
 st.markdown("Precise, 1:1 pixel fidelity employee photo framing.")
 
 # Main App Phase (Frame is embedded directly in code)
